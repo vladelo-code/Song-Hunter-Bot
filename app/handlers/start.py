@@ -5,6 +5,7 @@ from aiogram.filters import Command
 from app.keyboards.start_keyboard import start_keyboard
 from app.dependencies import db_session
 from app.db_utils.player import get_or_create_player
+from app.messages.texts import WELCOME_MESSAGE
 from app.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -23,7 +24,7 @@ async def start_command(message: Message) -> None:
     with db_session() as db:
         get_or_create_player(db, tg_id=str(message.from_user.id), tg_username=message.from_user.username)
 
-    await message.answer("Привет!", reply_markup=start_keyboard())
+    await message.answer(WELCOME_MESSAGE, parse_mode='html', reply_markup=start_keyboard())
 
 
 def register_handler(dp: Dispatcher) -> None:
