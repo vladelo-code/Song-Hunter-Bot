@@ -1,7 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.types import CallbackQuery
 
-from app.keyboards.rules_keyboard import rules_keyboard
+from app.keyboards.to_home_keyboard import to_home_keyboard
 from app.messages.texts import RULES, NO_USERNAME_USER
 from app.logger import setup_logger
 
@@ -18,7 +18,7 @@ async def show_rules_handler(callback: CallbackQuery) -> None:
     """
     username = callback.from_user.username or NO_USERNAME_USER
     logger.info(f"👋 Игрок @{username} запросил правила игры!")
-    await callback.message.edit_text(RULES, parse_mode='Markdown', reply_markup=rules_keyboard())
+    await callback.message.edit_text(RULES, parse_mode='Markdown', reply_markup=to_home_keyboard())
     await callback.answer()
 
 
