@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from typing import Optional, Tuple
 from datetime import datetime
 
 from app.models.player import Player
@@ -20,6 +21,13 @@ def get_or_create_player(session: Session, tg_id: str, tg_username: str) -> Play
         session.commit()
         session.refresh(player)
     return player
+
+
+def get_player_stat(session: Session, tg_id: str) -> Optional[Tuple[int, int, datetime, datetime]]:
+    player_info = session.query(Player).filter_by(tg_id=tg_id).first()
+    if player_info:
+        return player_info.total_games, player_info.total_score, player_info.first_seen, player_info.last_seen
+    return None
 
 
 def update_player_stats(session: Session, player_id: int, score: int):
