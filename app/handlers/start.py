@@ -1,5 +1,5 @@
 from aiogram import Dispatcher
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message
 from aiogram.filters import Command
 
 from app.keyboards.start_keyboard import start_keyboard
