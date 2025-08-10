@@ -18,7 +18,7 @@ async def home_handler(callback: CallbackQuery) -> None:
     """
     username = get_safe_username(callback.from_user.username)
     logger.info(f"👋 Игрок @{username} вернулся в главное меню.")
-    await callback.message.edit_text(HOME_MESSAGE, parse_mode='Markdown', reply_markup=start_keyboard())
+    await callback.message.edit_text(HOME_MESSAGE, parse_mode='html', reply_markup=start_keyboard())
     await callback.answer()
 
 
