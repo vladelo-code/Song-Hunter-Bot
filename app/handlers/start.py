@@ -3,6 +3,7 @@ from aiogram.types import Message
 from aiogram.filters import Command
 
 from app.keyboards.start_keyboard import start_keyboard
+from app.utils.safe_username import get_safe_username
 from app.dependencies import db_session
 from app.db_utils.player import get_or_create_player
 from app.messages.texts import WELCOME_MESSAGE
@@ -19,10 +20,11 @@ async def start_command(message: Message) -> None:
 
     :param message: Объект входящего сообщения от пользователя.
     """
-    logger.info(f"👋 Игрок @{message.from_user.username} запустил бота!")
+    username = get_safe_username(message.from_user.username)
+    logger.info(f"👋 Игрок @{username} запустил бота!")
 
     with db_session() as db:
-        get_or_create_player(db, tg_id=str(message.from_user.id), tg_username=message.from_user.username)
+        get_or_create_player(db, tg_id=str(message.from_user.id), tg_username=username)
 
     await message.answer(WELCOME_MESSAGE, parse_mode='html', reply_markup=start_keyboard())
 

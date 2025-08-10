@@ -2,7 +2,8 @@ from aiogram import Dispatcher
 from aiogram.types import CallbackQuery
 
 from app.keyboards.to_home_keyboard import to_home_keyboard
-from app.messages.texts import RULES, NO_USERNAME_USER
+from app.utils.safe_username import get_safe_username
+from app.messages.texts import RULES
 from app.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -16,7 +17,7 @@ async def show_rules_handler(callback: CallbackQuery) -> None:
 
     :param callback: Объект CallbackQuery от Telegram.
     """
-    username = callback.from_user.username or NO_USERNAME_USER
+    username = get_safe_username(callback.from_user.username)
     logger.info(f"👋 Игрок @{username} запросил правила игры!")
     await callback.message.edit_text(RULES, parse_mode='Markdown', reply_markup=to_home_keyboard())
     await callback.answer()
