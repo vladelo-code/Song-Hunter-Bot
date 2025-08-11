@@ -35,6 +35,13 @@
 
 ---
 
+<img src="photos/Example-photo1.png" width="600" style="display: block; margin: auto;" alt="Example-photo1">
+
+
+<img src="photos/Example-photo2.png" width="600" style="display: block; margin: auto;" alt="Example-photo2">
+
+---
+
 ## 🛠 Технологии
 
 - **[Aiogram](https://docs.aiogram.dev/)** — асинхронный фреймворк для создания Telegram-ботов на Python.  
@@ -283,7 +290,7 @@ Song-Hunter-Bot/
    ```
 2. 📂 Перейдите в папку проекта:
    ```bash
-   cd sea-battle-bot
+   cd Song-Hunter-Bot
    ```
 3. 📦 Установите зависимости:
    ```bash
@@ -310,7 +317,7 @@ Song-Hunter-Bot/
    ```
 2. Перейдите в папку проекта:
    ```bash
-   cd sea-battle-bot
+   cd Song-Hunter-Bot
    ```
 3. Создайте `.env` на основе `.env.template` и укажите ваш токен:
    ```bash
@@ -318,7 +325,7 @@ Song-Hunter-Bot/
    ```
 4. Постройте и запустите контейнер:
    ```bash
-   docker run -it --env-file .env song-Hunter-Bot
+   docker build -t song-hunter-bot . && docker run -it --env-file .env song-hunter-bot
    ```
 
 ---
