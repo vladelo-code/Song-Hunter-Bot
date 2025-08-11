@@ -58,10 +58,10 @@ async def answer_callback_handler(callback: CallbackQuery, state: FSMContext) ->
     if selected == correct:
         points = max(10, int((MAX_TIME - elapsed) * 5))
         score += points
-        await callback.answer(RIGHT_ANSWER.format(points))
+        await callback.answer(RIGHT_ANSWER.format(points=points))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
     else:
-        await callback.answer(WRONG_ANSWER.format(questions[current]['options'][correct]))
+        await callback.answer(WRONG_ANSWER.format(answer=questions[current]['options'][correct]))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
 
     await state.update_data(score=score)
