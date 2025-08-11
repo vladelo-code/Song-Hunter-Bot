@@ -5,6 +5,18 @@ from app.models.song import Song
 
 
 def generate_questions(session: Session, num_questions=5) -> list:
+    """
+    Генерирует список вопросов для игры, выбирая случайные песни из базы данных.
+    Для каждой песни формирует варианты ответов: правильный и 3 случайных неправильных.
+
+    :param session: SQLAlchemy сессия для работы с базой данных.
+    :param num_questions: Количество вопросов для генерации (по умолчанию 5).
+    :return: Список словарей с вопросами, где каждый словарь содержит:
+             - song_id: ID песни
+             - clip_path: путь к аудиоклипу
+             - options: список вариантов ответов (названия песен)
+             - correct: индекс правильного варианта
+    """
     songs_result = session.execute(
         select(Song).order_by(func.random()).limit(num_questions)
     )
