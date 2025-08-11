@@ -18,6 +18,18 @@ MAX_TIME = 20
 
 
 async def send_question(message: Message, state: FSMContext) -> None:
+    """
+    Отправляет текущий вопрос игроку.
+    - Проверяет текущий индекс вопроса.
+    - Если вопросы закончились, завершает игру.
+    - Отправляет аудио (голосовое сообщение) с отрывком трека.
+    - Отправляет текст с номером вопроса и временем на ответ.
+    - Устанавливает состояние ожидания ответа.
+    - Записывает время начала вопроса в состояние.
+
+    :param message: Объект Message для отправки сообщений.
+    :param state: FSMContext для доступа и обновления состояния игры.
+    """
     data = await state.get_data()
     current = data.get("current_question", 0)
     questions = data.get("questions")
@@ -44,6 +56,19 @@ async def send_question(message: Message, state: FSMContext) -> None:
 
 
 async def answer_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
+    """
+    Обрабатывает ответ пользователя на вопрос.
+    - Проверяет время ответа, при превышении времени сообщает и переходит к следующему вопросу.
+    - Определяет выбранный вариант и правильный ответ.
+    - Начисляет или списывает очки в зависимости от правильности.
+    - Обновляет статистику по треку в базе данных.
+    - Обновляет отображение кнопок с отмеченным ответом.
+    - Обновляет текущий счет в состоянии.
+    - Переходит к следующему вопросу.
+
+    :param callback: CallbackQuery с ответом пользователя.
+    :param state: FSMContext для доступа к состоянию игры.
+    """
     data = await state.get_data()
     current = data.get("current_question", 0)
     score = data.get("score", 0)
@@ -61,12 +86,13 @@ async def answer_callback_handler(callback: CallbackQuery, state: FSMContext) ->
     correct = questions[current]["correct"]
 
     if selected == correct:
-        points = max(10, int((MAX_TIME - elapsed) * 5))
+        points = max(1, int(MAX_TIME - elapsed))
         score += points
         correct_answered = True
         await callback.answer(RIGHT_ANSWER.format(points=points))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
     else:
+        score -= 10
         correct_answered = False
         await callback.answer(WRONG_ANSWER.format(answer=questions[current]['options'][correct]))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
@@ -79,6 +105,14 @@ async def answer_callback_handler(callback: CallbackQuery, state: FSMContext) ->
 
 
 async def next_question(message: Message, state: FSMContext) -> None:
+    """
+    Переходит к следующему вопросу.
+    - Увеличивает счетчик текущего вопроса.
+    - Отправляет следующий вопрос игроку.
+
+    :param message: Объект Message для отправки сообщений.
+    :param state: FSMContext для доступа к состоянию игры.
+    """
     data = await state.get_data()
     current = data.get("current_question", 0)
     await state.update_data(current_question=current + 1)
@@ -86,6 +120,16 @@ async def next_question(message: Message, state: FSMContext) -> None:
 
 
 async def finish_game(message: Message, state: FSMContext) -> None:
+    """
+    Завершает игру.
+    - Считывает итоговый счет из состояния.
+    - Сохраняет игру и обновляет статистику игрока в базе данных.
+    - Отправляет сообщение с итогами игроку.
+    - Очищает состояние FSM.
+
+    :param message: Объект Message для отправки сообщений.
+    :param state: FSMContext для очистки состояния.
+    """
     data = await state.get_data()
     score = data.get("score", 0)
     tg_id = data.get("tg_id")
@@ -98,4 +142,9 @@ async def finish_game(message: Message, state: FSMContext) -> None:
 
 
 def register_callback_handler(dp: Dispatcher) -> None:
+    """
+    Регистрирует обработчик callback-запросов для ответов на вопросы игры.
+
+    :param dp: Объект Dispatcher для регистрации обработчиков.
+    """
     dp.callback_query.register(answer_callback_handler, lambda c: c.data and c.data.startswith("answer_"))
