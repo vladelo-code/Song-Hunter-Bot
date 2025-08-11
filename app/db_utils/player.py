@@ -24,9 +24,18 @@ def get_or_create_player(session: Session, tg_id: str, tg_username: str = None) 
 
 
 def get_player_stat(session: Session, tg_id: str) -> Optional[Tuple[int, int, datetime, datetime]]:
+    """
+    Получает статистику игрока из базы данных по Telegram ID.
+
+    :param session: SQLAlchemy сессия для работы с базой данных.
+    :param tg_id: Telegram ID игрока.
+    :return: Кортеж с общим количеством игр, суммой очков,
+             датой первого запуска и датой последней активности,
+             либо None, если игрок не найден.
+    """
     player_info = session.query(Player).filter_by(tg_id=tg_id).first()
     if player_info:
-        return player_info.total_games, player_info.total_score, player_info.first_seen, player_info.last_seen
+        return player_info.total_games, player_info.total_score, player_info.first_seen, player_info.last_seen  # type: ignore
     return None
 
 
