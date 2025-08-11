@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 
 from app.handlers.game import send_question
 from app.dependencies import db_session
+from app.utils.safe_username import get_safe_username
 from app.db_utils.song import generate_questions
 from app.messages.texts import INTRO_GAME
 from app.logger import setup_logger
@@ -24,6 +25,9 @@ async def start_game_handler(callback: CallbackQuery, state: FSMContext) -> None
     :param callback: Объект CallbackQuery, инициировавший вызов.
     :param state: FSMContext для работы с состояниями пользователя.
     """
+    username = get_safe_username(callback.from_user.username)
+    logger.info(f"🎯 Игрок @{username} начал игру!")
+
     await callback.message.edit_text(INTRO_GAME, parse_mode='html', reply_markup=None)
 
     with db_session() as db:
