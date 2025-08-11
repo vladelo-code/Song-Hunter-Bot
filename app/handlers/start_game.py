@@ -22,7 +22,7 @@ async def start_game_handler(callback: CallbackQuery, state: FSMContext) -> None
         questions = generate_questions(db)
 
     # Инициализируем данные игры
-    await state.update_data(score=0, current_question=0, questions=questions)
+    await state.update_data(score=0, current_question=0, questions=questions, tg_id=callback.from_user.id)
     await send_question(callback.message, state)
     await callback.answer()
 

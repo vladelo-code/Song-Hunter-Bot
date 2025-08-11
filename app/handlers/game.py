@@ -5,6 +5,9 @@ from aiogram.types.input_file import FSInputFile
 import time
 import os
 
+from app.db_utils.game import add_game
+from app.db_utils.player import update_player_stats
+from app.dependencies import db_session
 from app.keyboards.game_keyboard import game_keyboard
 from app.keyboards.to_home_keyboard import to_home_from_game_keyboard
 from app.states import GameStates
@@ -78,6 +81,11 @@ async def next_question(message: Message, state: FSMContext) -> None:
 async def finish_game(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     score = data.get("score", 0)
+    tg_id = data.get("tg_id")
+
+    with db_session() as db:
+        add_game(db, str(tg_id), score)
+        update_player_stats(db, str(tg_id), score)
     await message.answer(FINISH_GAME.format(score=score), parse_mode="HTML", reply_markup=to_home_from_game_keyboard())
     await state.clear()
 

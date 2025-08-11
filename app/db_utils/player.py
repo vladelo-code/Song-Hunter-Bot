@@ -5,7 +5,7 @@ from datetime import datetime
 from app.models.player import Player
 
 
-def get_or_create_player(session: Session, tg_id: str, tg_username: str) -> Player:
+def get_or_create_player(session: Session, tg_id: str, tg_username: str = None) -> Player:
     """
     Получает игрока по Telegram ID или создаёт нового, если не найден.
 
@@ -30,16 +30,16 @@ def get_player_stat(session: Session, tg_id: str) -> Optional[Tuple[int, int, da
     return None
 
 
-def update_player_stats(session: Session, player_id: int, score: int):
+def update_player_stats(session: Session, tg_id: str, score: int):
     """
     Обновляет статистику игрока: увеличивает количество сыгранных игр, сумму очков
     и обновляет время последней активности.
 
     :param session: SQLAlchemy сессия для работы с базой данных.
-    :param player_id: Локальный ID игрока в базе данных.
+    :param tg_id: Telegram ID игрока в базе данных.
     :param score: Очки, набранные в последней игре, которые нужно добавить.
     """
-    player = session.query(Player).get(player_id)
+    player = session.query(Player).filter_by(tg_id=tg_id).first()
     if player:
         player.total_games += 1
         player.total_score += score
