@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from typing import Optional, Tuple, Type
 from datetime import datetime
 
-from app.models import Player
 from app.models.player import Player
 
 
@@ -52,7 +51,7 @@ def update_player_stats(session: Session, tg_id: str, score: int):
     player = session.query(Player).filter_by(tg_id=tg_id).first()
     if player:
         player.total_games += 1
-        player.total_score += score
+        player.total_score = max(0, player.total_score + score)
         player.last_seen = datetime.now()
         session.commit()
 
