@@ -1,4 +1,7 @@
-def format_song_stats(stats_with_songs):
+from app.models import Player
+
+
+def format_song_stats(stats_with_songs: list[Player]) -> str:
     """
     Форматирует список статистики по песням в читаемый текст для вывода в Telegram.
 

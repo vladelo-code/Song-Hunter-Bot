@@ -1,7 +1,8 @@
 from sqlalchemy.orm import Session
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Type
 from datetime import datetime
 
+from app.models import Player
 from app.models.player import Player
 
 
@@ -54,3 +55,14 @@ def update_player_stats(session: Session, tg_id: str, score: int):
         player.total_score += score
         player.last_seen = datetime.now()
         session.commit()
+
+
+def get_top_players(session: Session, limit: int = 10) -> list[Type[Player]]:
+    """
+    Получает топ лучших игроков из базы данных по сумме очков.
+
+    :param session: SQLAlchemy сессия для работы с базой данных.
+    :param limit: Максимальное количество игроков в топе (по умолчанию 10).
+    :return: Список объектов Player, отсортированных по убыванию total_score.
+    """
+    return session.query(Player).order_by(Player.total_score.desc()).limit(limit).all()
