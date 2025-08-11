@@ -27,7 +27,7 @@ async def start_command(message: Message) -> None:
     with db_session() as db:
         get_or_create_player(db, tg_id=str(message.from_user.id), tg_username=username)
 
-    await message.answer(WELCOME_MESSAGE, parse_mode='html', reply_markup=start_keyboard())
+    await message.answer(WELCOME_MESSAGE, parse_mode='html', disable_web_page_preview=True)
 
 
 def register_handler(dp: Dispatcher) -> None:
