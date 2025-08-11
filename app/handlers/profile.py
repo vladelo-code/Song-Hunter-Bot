@@ -22,7 +22,7 @@ async def profile_handler(callback: CallbackQuery) -> None:
     :param callback: Объект CallbackQuery от Telegram.
     """
     username = get_safe_username(callback.from_user.username)
-    logger.info(f"👋 Игрок @{username} запросил свою статистику!")
+    logger.info(f"👤 Игрок @{username} запросил свою статистику!")
 
     with db_session() as db:
         stat = get_player_stat(db, tg_id=str(callback.from_user.id))
