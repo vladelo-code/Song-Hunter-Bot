@@ -15,9 +15,11 @@ def add_songs_to_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
+    added = 0  # счетчик добавленных записей
+
     for filename in os.listdir(CLIPS_FOLDER):
         if filename.lower().endswith(".mp3"):
-            clip_path = os.path.join("clips", filename)  # относительный путь
+            clip_path = os.path.join("clips", filename)
             name = filename.rsplit(".", 1)[0]
 
             if " - " in name:
@@ -25,14 +27,21 @@ def add_songs_to_db():
             else:
                 artist, title = None, name
 
-            cursor.execute("""
-            INSERT INTO songs (title, artist, category, year, clip_path)
-            VALUES (?, ?, ?, ?, ?)
-            """, (title, artist, None, None, clip_path))
+            cursor.execute("SELECT id FROM songs WHERE clip_path = ?", (clip_path,))
+            if cursor.fetchone() is None:
+                cursor.execute("""
+                    INSERT INTO songs (title, artist, category, year, clip_path)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (title, artist, None, None, clip_path))
+                added += 1
+            else:
+                print(f"Пропускаем {clip_path}, запись уже есть в базе.")
 
     conn.commit()
     conn.close()
-    print("✅ Песни успешно добавлены в базу данных!")
+
+    if added > 0:
+        print(f"✅ Обновление базы данных завершено! Добавлено записей: {added}")
 
 
 if __name__ == "__main__":

@@ -304,7 +304,13 @@ Song-Hunter-Bot/
     ```bash
    alembic upgrade head
    ```
-6. 🚀 Запустите бота:
+   
+6. 🗄️ Наполните БД треками:
+   ```bash
+   python app/db_utils/add_songs_to_db.py
+   ```
+
+7. 🚀 Запустите бота:
    ```bash
    python app/bot.py
    ```
