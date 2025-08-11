@@ -19,7 +19,7 @@ async def show_rules_handler(callback: CallbackQuery) -> None:
     :param callback: Объект CallbackQuery от Telegram.
     """
     username = get_safe_username(callback.from_user.username)
-    logger.info(f"👋 Игрок @{username} запросил правила игры!")
+    logger.info(f"🚓 Игрок @{username} запросил правила игры!")
     await callback.message.edit_text(RULES, parse_mode='Markdown', reply_markup=to_home_keyboard())
     await callback.answer()
 
