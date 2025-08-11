@@ -9,7 +9,7 @@ def format_rating_stats(players: list[Player]) -> str:
     :param players: Список объектов Player.
     :return: Отформатированная строка с рейтингом игроков.
     """
-    lines = ["🏆 <b>Топ игроков по рейтингу:</b>\n"]
+    lines = ["🏆 <b>Топ игроков по сумме очков:</b>\n"]
     for i, player in enumerate(players, 1):
         username = get_safe_username(player.tg_username)
         score = player.total_score

@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select, desc
 from typing import Optional, Tuple, Type
 from datetime import datetime
 
 from app.models.player import Player
+from app.models.game_session import GameSession
 
 
 def get_or_create_player(session: Session, tg_id: str, tg_username: str = None) -> Player:
@@ -65,3 +67,22 @@ def get_top_players(session: Session, limit: int = 10) -> list[Type[Player]]:
     :return: Список объектов Player, отсортированных по убыванию total_score.
     """
     return session.query(Player).order_by(Player.total_score.desc()).limit(limit).all()
+
+
+def get_top_best_games(session: Session, limit: int = 5) -> list[Type[GameSession]]:
+    """
+    Возвращает топ-5 игр с наибольшим количеством очков за одну сессию.
+    """
+    stmt = (
+        select(
+            Player.tg_username,
+            GameSession.score,
+            GameSession.played_at
+        )
+        .join(Player, Player.id == GameSession.player_id)
+        .order_by(desc(GameSession.score))
+        .limit(limit)
+    )
+
+    result = session.execute(stmt)
+    return result.all()
