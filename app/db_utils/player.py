@@ -69,18 +69,43 @@ def get_top_players(session: Session, limit: int = 10) -> list[Type[Player]]:
     return session.query(Player).order_by(Player.total_score.desc()).limit(limit).all()
 
 
-def get_top_best_games(session: Session, limit: int = 5) -> list[Type[GameSession]]:
+from sqlalchemy import select, desc, func
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import over
+from app.models import Player, GameSession
+
+
+def get_top_best_games(session: Session, limit: int = 5) -> list[tuple]:
     """
-    Возвращает топ-5 игр с наибольшим количеством очков за одну сессию.
+    Возвращает топ игр с наибольшим количеством очков за одну сессию.
+    Каждый игрок попадает в топ только один раз — с его лучшим результатом.
+
+    Работает в SQLite с помощью оконных функций.
+
+    :param session: Активная сессия SQLAlchemy.
+    :param limit: Максимальное количество записей в топе.
+    :return: Список кортежей (tg_username, score, played_at).
     """
-    stmt = (
+    row_number = func.row_number().over(
+        partition_by=Player.id,  # для каждого игрока
+        order_by=desc(GameSession.score)  # сортируем по убыванию очков
+    )
+
+    ranked_games = (
         select(
             Player.tg_username,
             GameSession.score,
-            GameSession.played_at
+            GameSession.played_at,
+            row_number.label("rnk")
         )
         .join(Player, Player.id == GameSession.player_id)
-        .order_by(desc(GameSession.score))
+        .subquery()
+    )
+
+    stmt = (
+        select(ranked_games.c.tg_username, ranked_games.c.score)
+        .where(ranked_games.c.rnk == 1)  # только лучший результат на игрока
+        .order_by(desc(ranked_games.c.score))
         .limit(limit)
     )
 

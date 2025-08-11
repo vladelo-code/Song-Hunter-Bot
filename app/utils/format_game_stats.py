@@ -10,7 +10,7 @@ def format_game_stats(games: list[tuple]) -> str:
     :return: Отформатированная строка с топом игровых сессий.
     """
     lines = ["⚡ <b>Топ игр по результату за одну игру:</b>\n"]
-    for i, (username_raw, score, played_at) in enumerate(games, 1):
+    for i, (username_raw, score) in enumerate(games, 1):
         username = get_safe_username(username_raw)
         lines.append(f"{i}. <b>@{username}</b> — <tg-spoiler>{score}</tg-spoiler> очков")
     return "\n".join(lines)
