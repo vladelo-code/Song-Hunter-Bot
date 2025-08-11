@@ -7,6 +7,7 @@ import os
 
 from app.db_utils.game import add_game
 from app.db_utils.player import update_player_stats
+from app.db_utils.stats_songs import update_song_stats
 from app.dependencies import db_session
 from app.keyboards.game_keyboard import game_keyboard
 from app.keyboards.to_home_keyboard import to_home_from_game_keyboard
@@ -47,6 +48,7 @@ async def answer_callback_handler(callback: CallbackQuery, state: FSMContext) ->
     current = data.get("current_question", 0)
     score = data.get("score", 0)
     questions = data.get("questions")
+    song_id = questions[current]["song_id"]
     start_time = data.get("start_time", time.time())
 
     elapsed = time.time() - start_time
@@ -61,11 +63,16 @@ async def answer_callback_handler(callback: CallbackQuery, state: FSMContext) ->
     if selected == correct:
         points = max(10, int((MAX_TIME - elapsed) * 5))
         score += points
+        correct_answered = True
         await callback.answer(RIGHT_ANSWER.format(points=points))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
     else:
+        correct_answered = False
         await callback.answer(WRONG_ANSWER.format(answer=questions[current]['options'][correct]))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
+
+    with db_session() as db:
+        update_song_stats(db, song_id, correct_answered)
 
     await state.update_data(score=score)
     await next_question(callback.message, state)

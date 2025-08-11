@@ -26,6 +26,7 @@ def generate_questions(session: Session, num_questions=5) -> list:
         correct_index = options.index(correct_answer)
 
         questions.append({
+            "song_id": song.id,
             "clip_path": song.clip_path,
             "options": options,
             "correct": correct_index,
