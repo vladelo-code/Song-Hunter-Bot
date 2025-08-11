@@ -1,5 +1,6 @@
 from aiogram import Dispatcher
 from aiogram.types import CallbackQuery
+from aiogram.filters import StateFilter
 
 from app.keyboards.to_home_keyboard import to_home_keyboard
 from app.utils.safe_username import get_safe_username
@@ -29,4 +30,4 @@ def register_callback_handler(dp: Dispatcher) -> None:
 
     :param dp: Объект диспетчера aiogram.
     """
-    dp.callback_query.register(show_rules_handler, lambda c: c.data == "rules")
+    dp.callback_query.register(show_rules_handler, lambda c: c.data == "rules", StateFilter(None))

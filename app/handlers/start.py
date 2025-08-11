@@ -1,6 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.types import Message
 from aiogram.filters import Command
+from aiogram.filters import StateFilter
 
 from app.keyboards.start_keyboard import start_keyboard
 from app.utils.safe_username import get_safe_username
@@ -36,4 +37,4 @@ def register_handler(dp: Dispatcher) -> None:
 
     :param dp: Объект диспетчера aiogram.
     """
-    dp.message.register(start_command, Command("start"))
+    dp.message.register(start_command, Command("start"), StateFilter(None))

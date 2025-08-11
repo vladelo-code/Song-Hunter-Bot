@@ -1,6 +1,6 @@
 from aiogram import Dispatcher
 
-from app.handlers import start, start_game, rules, home, profile
+from app.handlers import start, start_game, rules, home, profile, game
 
 
 def register_handlers(dp: Dispatcher) -> None:
@@ -14,3 +14,4 @@ def register_handlers(dp: Dispatcher) -> None:
     rules.register_callback_handler(dp)
     home.register_callback_handler(dp)
     profile.register_callback_handler(dp)
+    game.register_callback_handler(dp)
