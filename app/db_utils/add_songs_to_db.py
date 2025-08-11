@@ -7,6 +7,11 @@ CLIPS_FOLDER = os.path.join(BASE_DIR, "clips")
 
 
 def add_songs_to_db():
+    """
+    Сканирует папку с mp3 файлами и добавляет записи о песнях в базу данных SQLite.
+    Формат имени файла должен быть "Artist - Title.mp3" или просто "Title.mp3".
+    Вставляет относительный путь к аудиофайлу в поле clip_path.
+    """
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
@@ -15,7 +20,6 @@ def add_songs_to_db():
             clip_path = os.path.join("clips", filename)  # относительный путь
             name = filename.rsplit(".", 1)[0]
 
-            # Парсим имя файла: "Artist - Title.mp3"
             if " - " in name:
                 artist, title = name.split(" - ", 1)
             else:
