@@ -70,7 +70,6 @@ async def answer_callback_handler(callback: types.CallbackQuery, state: FSMConte
         await next_question(callback.message, state)
         return
 
-    # Получаем выбранный вариант из callback_data
     selected = int(callback.data.split("_")[1])
     correct = questions[current]["correct"]
 
