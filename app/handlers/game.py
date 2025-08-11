@@ -1,34 +1,19 @@
-from aiogram import Dispatcher, types
-from aiogram.filters import StateFilter
+from aiogram import Dispatcher
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import State, StatesGroup
 from aiogram.types.input_file import FSInputFile
 import time
 import os
 
-from app.db_utils.song import generate_questions
-from app.dependencies import db_session
 from app.keyboards.game_keyboard import game_keyboard
+from app.keyboards.to_home_keyboard import to_home_from_game_keyboard
+from app.states import GameStates
+from app.messages.texts import TIME_LIMIT, RIGHT_ANSWER, WRONG_ANSWER, QUESTION, FINISH_GAME
+
+MAX_TIME = 20
 
 
-class GameStates(StatesGroup):
-    WAIT_ANSWER = State()
-
-
-MAX_TIME = 20  # секунд на ответ
-
-
-async def start_game_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
-    with db_session() as db:
-        questions = generate_questions(db)
-
-    # Инициализируем данные игры
-    await state.update_data(score=0, current_question=0, questions=questions)
-    await send_question(callback.message, state)
-    await callback.answer()
-
-
-async def send_question(message: types.Message, state: FSMContext) -> None:
+async def send_question(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     current = data.get("current_question", 0)
     questions = data.get("questions")
@@ -47,17 +32,14 @@ async def send_question(message: types.Message, state: FSMContext) -> None:
     else:
         await message.answer(f"Ошибка: файл {question['clip_path']} не найден.")
 
-    # Отправляем вопрос с кнопками
-    await message.answer(
-        f"Вопрос {current + 1} из {len(questions)}.\n"
-        f"У тебя есть {MAX_TIME} секунд, чтобы ответить.",
-        reply_markup=game_keyboard(question),
-    )
+    await message.answer(QUESTION.format(question=current + 1, lenght=len(questions), time=MAX_TIME),
+                         parse_mode="HTML",
+                         reply_markup=game_keyboard(question))
     await state.set_state(GameStates.WAIT_ANSWER)
     await state.update_data(start_time=time.time())
 
 
-async def answer_callback_handler(callback: types.CallbackQuery, state: FSMContext) -> None:
+async def answer_callback_handler(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
     current = data.get("current_question", 0)
     score = data.get("score", 0)
@@ -66,7 +48,7 @@ async def answer_callback_handler(callback: types.CallbackQuery, state: FSMConte
 
     elapsed = time.time() - start_time
     if elapsed > MAX_TIME:
-        await callback.answer("Время вышло! Ответ не засчитан.", show_alert=True)
+        await callback.answer(TIME_LIMIT, show_alert=True)
         await next_question(callback.message, state)
         return
 
@@ -74,32 +56,31 @@ async def answer_callback_handler(callback: types.CallbackQuery, state: FSMConte
     correct = questions[current]["correct"]
 
     if selected == correct:
-        points = max(1, int((MAX_TIME - elapsed) * 10))  # пример: максимум 200 очков
+        points = max(10, int((MAX_TIME - elapsed) * 5))
         score += points
-        await callback.answer(f"Верно! Ты заработал {points} очков.")
+        await callback.answer(RIGHT_ANSWER.format(points))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
     else:
-        await callback.answer(f"Неверно! Правильный ответ: {questions[current]['options'][correct]}")
+        await callback.answer(WRONG_ANSWER.format(questions[current]['options'][correct]))
         await callback.message.edit_reply_markup(reply_markup=game_keyboard(questions[current], selected=selected))
 
     await state.update_data(score=score)
     await next_question(callback.message, state)
 
 
-async def next_question(message: types.Message, state: FSMContext) -> None:
+async def next_question(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     current = data.get("current_question", 0)
     await state.update_data(current_question=current + 1)
     await send_question(message, state)
 
 
-async def finish_game(message: types.Message, state: FSMContext) -> None:
+async def finish_game(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     score = data.get("score", 0)
-    await message.answer(f"Игра окончена! Твой итоговый счет: <b>{score}</b>.", parse_mode="HTML")
+    await message.answer(FINISH_GAME.format(score=score), parse_mode="HTML", reply_markup=to_home_from_game_keyboard())
     await state.clear()
 
 
 def register_callback_handler(dp: Dispatcher) -> None:
-    dp.callback_query.register(start_game_handler, lambda c: c.data == "start_game", StateFilter(None))
     dp.callback_query.register(answer_callback_handler, lambda c: c.data and c.data.startswith("answer_"))
