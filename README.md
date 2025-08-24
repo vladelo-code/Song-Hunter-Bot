@@ -357,7 +357,7 @@ Song-Hunter-Bot/
 🚀 **[Перейти к боту в Telegram](https://t.me/song_sniper_bot)**
 
 Автор: Владислав Лахтионов  
-GitHub: [vladelo777](https://github.com/vladelo-code)  
+GitHub: [vladelo-code](https://github.com/vladelo-code)  
 Telegram: [@vladelo](https://t.me/vladelo)
 
 💌 Не забудьте поставить звезду ⭐ на GitHub, если вам понравился бот! 😉
