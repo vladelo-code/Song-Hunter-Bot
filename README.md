@@ -286,7 +286,7 @@ Song-Hunter-Bot/
 
 1. 🗃️ Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/vladelo777/Song-Hunter-Bot.git
+   git clone https://github.com/vladelo-code/Song-Hunter-Bot.git
    ```
 2. 📂 Перейдите в папку проекта:
    ```bash
@@ -319,7 +319,7 @@ Song-Hunter-Bot/
 
 1. Клонируйте репозиторий:
    ```bash
-   git clone https://github.com/vladelo777/Song-Hunter-Bot.git
+   git clone https://github.com/vladelo-code/Song-Hunter-Bot.git
    ```
 2. Перейдите в папку проекта:
    ```bash
