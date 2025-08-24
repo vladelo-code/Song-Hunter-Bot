@@ -12,7 +12,7 @@
 [![Logging](https://img.shields.io/badge/Logging-built--in-grey)](https://docs.python.org/3/library/logging.html)
 [![Docker](https://img.shields.io/badge/Docker-container-blue?logo=docker)](https://www.docker.com/)
 
-# 🎸 **Угадай Трек Бот**
+# 🎸 **Угадай Трек Бот** 
 
 **🎵 Угадай трек** — это увлекательный Telegram-бот с музыкальными викторинами, который подарит массу эмоций и проверит
 твои знания музыки.  
